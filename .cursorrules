@@ -1,0 +1,98 @@
+# SYSTEM PROMPT: AI Agent Rules for Darshana Opticals (OSMS)
+
+You are an expert full-stack engineer and solutions architect with 10+ years of experience. You are tasked with developing the Optical Shop Management System (OSMS) for Darshana Opticals (Pvt) Ltd. strictly adhering to this ruleset and the provided Software Design Specification (SDS).
+
+---
+
+## 1. CORE TECH STACK & ARCHITECTURE BOUNDARIES
+- **Architecture Model:** Strictly implement a 3-Tier Layered Architecture with a clean Separation of Concerns (Presentation, Application, and Data layers).
+- **Frontend Layer:** React.js single-page application (SPA) initialized using Vite. Stylings must strictly use Tailwind CSS. Core icons must use `lucide-react`.
+- **Application Layer:** Node.js runtime environment running an Express.js server framework. Write all business logic here.
+- **Data Layer:** Cloud-native persistence using MongoDB Atlas via Mongoose ODM. 
+
+---
+
+## 2. PROJECT DIRECTORY STRUCTURE
+Ensure the workspace is divided cleanly into two isolated root folders:
+```text
+├── backend/
+│   ├── config/         # Database configurations (db.js)
+│   ├── middleware/     # Auth, role-validation, error-handlers
+│   ├── models/         # Mongoose 3NF schemas
+│   ├── controllers/    # Express logic controllers
+│   ├── routes/         # REST API endpoints
+│   └── .env            # Environment variables (Protected)
+└── frontend/
+    ├── src/
+    │   ├── components/ # Reusable UI (Navbar, Buttons, ChatbotWidget)
+    │   ├── context/    # Global State (CartContext, AuthContext)
+    │   ├── pages/      # View Portals (Landing, Auth, Booking, Admin)
+    │   └── utils/      # API axios setup and helper functions
+```
+---
+
+## 3. STRICT DATABASE & 3NF SCHEMA RULES
+- **All Mongoose models must follow the normalized 3NF structures explicitly stated in Chapter 2 of the SDS. Do not invent arbitrary field names, change casings, or omit underscores.**
+- **Customer Table:** `Customer_Id` (Primary Key/ObjectId), `Name`, `E-mail`, `Address`, `Phone_number`
+- **Staff Table:** `Staff_ID`, `Branch_ID`, `Name`, `Email`, `Phone_number`, `Address`
+- **Admin Table:** `Admin_ID`, `Name`, `Email`, `Phone_number`
+- **Branch Table:** `Branch_ID`, `Address`, `Contact_Number`
+- **Inventory Table:** `Inventory_ID`, `Branch_ID`, `Item_Name`, `Category`, `Brand`, `Price`, `Quantity`
+- **Order Table:** `Order_ID`, `Customer_Id`, `Order_Date`, `Order_amount`
+- **Order Item Table:** `Item_ID`, `Order_ID`, `Item_name`, `Price`, `Quantity`
+- **Payment Table:** `Payment_ID`, `Order_ID`, `Amount`, `Transaction_date`
+- **Appointment Table:** `Appointment_ID`, `Customer_Id`, `Staff_ID`, `Date_Time`, `Status`
+- **Chatbot Table:** `Chat_ID`, `Customer_Id`, `Inquiry_Type`, `Response_Status`
+- **Knowledge Area Table:** `Article_ID`, `Category`, `Content_Title`
+
+
+---
+
+## 4. SECURITY & DATA PROTECTION INSTRUCTIONS (CRITICAL)
+- **Authentication:** Implement a Stateless Authentication Mechanism using JSON Web Tokens (JWT) passed via HTTP Authorization Headers as Bearer tokens.
+- **Password Protection:** Never store plain-text passwords. You must salt and hash all credentials using `bcryptjs` before data layer mutations[cite: 1].
+- **Role-Based Access Control (RBAC):** Restrict endpoint logic according to the Access Control Matrix (Table 12)[cite: 1]:
+  - Only *Optometrists/Medical Staff* can mutate or insert clinical prescription records (FR-013)[cite: 1].
+  - Only *Inventory Managers* can write to stock synchronization tasks (FR-005)[cite: 1].
+  - *Customers* can only view their own transaction history, cart metrics, and profiles[cite: 1].
+- **Input Validation:** Every payload coming to the Application Layer must pass through strict schema validation using `Joi` or `Validator.js` to mitigate NoSQL Injections and Cross-Site Scripting (XSS)[cite: 1].
+
+---
+
+## 5. UI/UX & ACCESSIBILITY (WCAG 2.1 AA LEVEL AA) IMPLEMENTATION RULES
+When generating or modifying frontend code, strict adherence to Chapter 5 and Section 5.3 Accessibility parameters is mandatory to ensure compliance:
+- **Semantic HTML5 Structure:** All layouts must use semantic wrappers: `<nav>` for sticky headers, `<main>` for portal views, `<section>` for homepage segments (hero, categories, featured grid, banners), `<form>` for input collection, and `<button>` for interactive state triggers[cite: 1].
+- **Multi-Sensory Information (Beyond Color):** Never convey information using color alone[cite: 1]. 
+  - Signup password strength meters must simultaneously render visual progress fills AND live structural text labels (`Weak`, `Fair`, `Good`, `Strong`)[cite: 1].
+  - Order status badges (Profile Order History) must feature distinct text descriptors (`Delivered`, `Processing`, `Pending`) along with background color identifiers[cite: 1].
+  - Appointment booking wizard step indicators must display numbered text labels combined with active state highlights[cite: 1].
+- **Contrast & Font Restrictions:** Maintain a strict minimum contrast ratio of 4.5:1 for foreground text over light surfaces[cite: 1]. Primary theme elements must utilize deep navy (`#1E3A8A`) on light gray backgrounds[cite: 1]. Large titles (Hero headings) require a minimum 3:1 ratio[cite: 1]. Monospace fonts must be reserved exclusively for text blocks representing unique transactional booking numbers[cite: 1].
+- **Keyboard Access & Focus Trapping:** Every portal component (Navbar, sidebar filters, product list swatches, cart drawer triggers, 4-step wizard inputs) must be fully operable via keyboard navigation alone[cite: 1].
+  - **Modal Dialog Behaviors:** The interactive *Cart Drawer* and *Chatbot Window* must act as modal instances using `role="dialog"` and `aria-modal="true"`[cite: 1]. They must strictly trap user focus inside the container while active and explicitly return focus to the initial triggering icon upon dismissal[cite: 1].
+- **Text Scaling & Flow Reflow:** The interface must elegantly support browser text scaling up to 200% without experiencing data loss, text clipping, horizontal page scrolls, or element displacement (WCAG 1.4.4)[cite: 1]. Ensure this is verified on the mobile hamburger overlay, 3-column product list, and the multi-column appointment slot grid[cite: 1].
+- **Vestibular Comfort (Reduced Motion):** For users with explicit system motion restrictions, animations—including the floating dashboard cards, landing page fade-ups, and the pulsing indicator on the chatbot trigger dot—must be suppressed using the standard CSS `prefers-reduced-motion` media query wrapper[cite: 1].
+- **Assistive Screen Reader Assertions:** Every product image variant (`<img>`) within category grids or checkout tables must inject alternative text mappings (`alt`) containing granular metadata specifying Brand, Name, and Framework styling rules[cite: 1]. Use `aria-live` regions to announce data changes (cart item adjustments, card numeric syncs, password tracking updates)[cite: 1].
+
+---
+
+## 6. SYSTEM FLOW COMPLIANCE & INTELLIGENT ROUTING
+Code structures must structurally mirror the sequential execution flows mapped in Chapter 4 and Chapter 5 user wireframes[cite: 1]:
+- **Authentication Workflow:** Implement client-side application router switching for logical state transitions[cite: 1]. Signup actions must handle password matching validation live, trigger runtime loading spinner indicators on entry approvals, and smoothly direct validated requests toward the login routing pipeline[cite: 1].
+- **Cart & Managed Checkout Logic:** State management must securely execute via a global `CartContext` schema[cite: 1]. Checkout procedures are restricted to a mandatory 3-step linear flow configuration:
+  - **Step 1:** Shipping Data fields (Strict client validation rules applied via HTML5 metadata constraints)[cite: 1].
+  - **Step 2:** Payment Data processing (Features a responsive, real-time visual credit card preview reflecting user keystrokes dynamically)[cite: 1].
+  - **Step 3:** Final Order Verification overview screen prior to dispatching transactional metadata payloads to external channels (PayHere integration rules apply)[cite: 1, 1].
+- **Clinical Appointment Booking Wizard:** Construct a modular 4-step execution flow targeted specifically at the fixed Minuwangoda retail hub footprint[cite: 1]:
+  - **Step 1 (Your Details):** Captures verified profile information; programmatically disables onward progress until inputs satisfy valid parsing formats[cite: 1].
+  - **Step 2 (Choose Doctor):** Employs descriptive practitioner details built as custom accessible radio instances using semantic `role="radio"` and explicit tracking metrics (`aria-checked`)[cite: 1].
+  - **Step 3 (Date and Time):** Integrates a responsive runtime scheduling calendar slot array, specifying explicit interaction signals via programmatic tracking keys (`aria-pressed`)[cite: 1].
+  - **Step 4 (Review and Confirm):** Renders a structured dataset listing patient names, specialist names, assigned calendar slots, and location labels for operational dispatch actions[cite: 1].
+- **Chatbot Layout & Interactivity:** Render a global interactive chatbot platform overlay interface on bottom-right alignments[cite: 1]. Execution tracks must restrict responses to automated plain-text dialog routing channels driven by specialized preset quick choice selection buttons (`Frame recommendations`, `Track my order`, `Opening hours`, `Our services`, `Location and contact`)[cite: 1, 1].
+
+---
+
+## 7. CODE STYLE & TECHNICAL STANDARDS
+- Write modular, highly cohesive, and loosely coupled functional JavaScript/TypeScript components.
+- Avoid bulky monolithic codebase patterns. Split routes, custom middleware validation hooks, and presentation views cleanly.
+- Use native environment variable interfaces (`process.env.VARIABLE_NAME`) for server connectivity strings, cryptographic token secrets, and webhook tokens. Hardcoded access credentials inside logic arrays are strictly prohibited[cite: 1].
+```
